@@ -1,0 +1,86 @@
+.preview-wrapper {
+    display: flex;
+    justify-content: center;
+    background: #525659;
+    padding: 20px;
+}
+
+.preview-page-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.preview-field-item {
+    position: absolute;
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.preview-field-text {
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+    font-family: Helvetica, sans-serif;
+    background: white;
+    display: flex;
+    align-items: center;
+    overflow: visible;
+    white-space: nowrap;
+    padding: 2px;
+}
+
+.preview-field-textarea {
+    width: 100%;
+    min-height: 100%;
+    height: auto;
+    font-size: 12px;
+    font-family: Helvetica, sans-serif;
+    background: white;
+    display: flex;
+    align-items: flex-start;
+    white-space: pre-wrap;
+    padding: 2px;
+}
+
+.preview-field-checkbox,
+.preview-field-radio {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-field-signature {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+}
+
+.preview-field-signature.placeholder {
+    color: #ccc;
+}
+
+.signature-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Modal and Print Styles */
+.document-preview-modal.custom-modal-style {
+    top: 20px;
+}
+
+.document-preview-modal .ant-modal-body {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.preview-checkbox-input {
+    transform: scale(1.5);
+    margin: 0;
+}

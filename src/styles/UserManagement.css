@@ -1,0 +1,15 @@
+/* ViewUser Styles */
+.user-management-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-status-tag {
+    text-transform: uppercase;
+    margin-right: 4px;
+}
+
+.user-name-link {
+    font-weight: 500;
+}

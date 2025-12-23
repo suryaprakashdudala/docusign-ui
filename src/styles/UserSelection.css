@@ -1,0 +1,31 @@
+.user-selection-card {
+    margin-bottom: 16px;
+}
+
+.user-selection-space {
+    width: 100%;
+}
+
+.user-selection-label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.user-selection-select {
+    width: 100%;
+}
+
+.user-selection-username {
+    color: #999;
+}
+
+.user-selection-tag {
+    padding: 4px 12px;
+    font-size: 14px;
+}
+
+.user-selection-actions {
+    display: flex;
+    justify-content: space-between;
+}

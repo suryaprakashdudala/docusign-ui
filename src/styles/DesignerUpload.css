@@ -1,0 +1,17 @@
+.designer-upload-file-info {
+    margin-top: 12px;
+}
+
+.designer-upload-progress {
+    margin-top: 12px;
+}
+
+.designer-upload-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.designer-upload-id-info {
+    margin-top: 12px;
+}

@@ -1,0 +1,107 @@
+.pdf-viewer-container {
+    position: relative;
+    background: white;
+    width: 100%;
+    padding: 0;
+    min-height: auto;
+}
+
+.pdf-viewer-container.cursor-crosshair {
+    cursor: crosshair;
+}
+
+.pdf-viewer-container.cursor-default {
+    cursor: default;
+}
+
+.pdf-loading-container {
+    padding: 40px;
+    text-align: center;
+}
+
+.pdf-error-container {
+    padding: 40px;
+    text-align: center;
+    color: #ff4d4f;
+}
+
+.pdf-error-title {
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.pdf-no-document-container {
+    padding: 40px;
+    text-align: center;
+    color: #999;
+}
+
+.pdf-no-document-title {
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.pdf-no-document-subtitle {
+    margin-bottom: 16px;
+    font-size: 12px;
+}
+
+.pdf-document-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    min-height: auto;
+    background: white;
+}
+
+.pdf-pages-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0 0 0;
+    width: 100%;
+    background: white;
+}
+
+.pdf-page-container {
+    position: relative;
+    display: inline-block;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    width: 600px;
+    overflow: visible;
+}
+
+.pdf-fields-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.pdf-field-rnd {
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    z-index: 10;
+    cursor: move;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    pointer-events: auto;
+}
+
+.pdf-field-content {
+    width: 100%;
+    height: 100%;
+    padding: 4px 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
