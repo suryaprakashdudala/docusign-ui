@@ -161,7 +161,7 @@ const DesignerDocuments = (props) => {
                         </Space>
                     </div>
                 } 
-                bordered={false}
+                variant="borderless"
             >
                 <Table 
                     columns={columns} 

@@ -46,9 +46,14 @@ const DocumentCompletion = (props) => {
       setPdfUrl(url)
 
       const initialValues = {}
+      const consolidated = completion.consolidatedData || {}
+      
       if (designerData.fields) {
           designerData.fields.forEach(f => {
-              initialValues[f.id] = f.defaultValue || ''
+              // Use consolidated data if exists, otherwise default value
+              initialValues[f.id] = (consolidated[f.id] !== undefined && consolidated[f.id] !== null && consolidated[f.id] !== '')
+                ? consolidated[f.id] 
+                : (f.defaultValue || '')
           })
       }
       setFieldValues(initialValues)
@@ -298,20 +303,21 @@ const DocumentCompletion = (props) => {
              ))}
            </Document>
         </div>
-
-        <div className="completion-footer">
-          <Space>
-            <Button onClick={() => navigate('/')}>Cancel</Button>
-            <Button
-              type="primary"
-              size="large"
-              loading={submitting}
-              onClick={handleSubmit}
-            >
-              Submit Document
-            </Button>
-          </Space>
-        </div>
+        {designer &&
+          <div className="completion-footer">
+            <Space>
+              <Button onClick={() => navigate('/')}>Cancel</Button>
+              <Button
+                type="primary"
+                size="large"
+                loading={submitting}
+                onClick={handleSubmit}
+              >
+                Submit Document
+              </Button>
+            </Space>
+          </div>
+        }
       </Card>
 
       <Modal
