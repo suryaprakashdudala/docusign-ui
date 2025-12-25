@@ -19,7 +19,6 @@ const isValidEmail = (value) =>
 
 const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
   const [selectedValues, setSelectedValues] = useState([])
-  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
 
@@ -134,7 +133,6 @@ const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
               placeholder="Select users or type an email address"
               value={selectedValues}
               onChange={handleUserChange}
-              loading={loading}
               optionLabelProp="label"
               tokenSeparators={[',', ' ']}
             >
