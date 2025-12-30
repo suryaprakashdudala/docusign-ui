@@ -1,5 +1,5 @@
 import { Card, Input, Button, Form } from 'antd'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import '../styles/Auth.css'
 import {validationMessages} from '../constants/constants'
 import {useState} from 'react'
@@ -26,10 +26,6 @@ const LoginPage = (props) => {
       console.error("Login failed", e);
     }
     setLoginBtnLoading(false)
-  }
-
-  const handleForgotPassword = async () => {
-    navigate('/forgot-password')
   }
 
   return (
@@ -68,12 +64,7 @@ const LoginPage = (props) => {
           </Form.Item>
 
           <div className="forgot-password-helper">
-            <a
-              onClick={handleForgotPassword}
-              className="forgot-password-link"
-            >
-              Forgot Password?
-            </a>
+            <Link to='/forgot-password' className="forgot-password-link">Forgot Password?</Link>
           </div>
 
           <Button loading={loginBtnLoading} type="primary" htmlType="submit" block>

@@ -3,19 +3,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
     background-size: 400% 400%;
     padding: 24px;
+    background-color: rgb(245, 243, 243);
 }
 
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
 
 .session-expiry-card {
-    background: rgba(255, 255, 255, 0.25);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -24,63 +18,29 @@
     padding: 48px;
     max-width: 500px;
     text-align: center;
-    animation: fadeInScale 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
 }
 
 .expiry-icon {
     font-size: 84px;
-    color: #fff;
     margin-bottom: 24px;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
 }
 
 .expiry-title {
     font-size: 32px;
     font-weight: 700;
-    color: #fff;
     margin-bottom: 16px;
     letter-spacing: -0.5px;
 }
 
 .expiry-message {
     font-size: 16px;
-    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 32px;
     line-height: 1.6;
 }
 
-.login-redirect-btn {
-    height: 50px;
-    padding: 0 40px;
-    font-size: 16px;
+.login-link {
+    text-decoration: underline;
     font-weight: 600;
-    border-radius: 12px;
-    background: #fff;
-    color: #e73c7e;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.login-redirect-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    background: #f8f8f8;
-    color: #d6336c;
-}
-
-.login-redirect-btn:active {
-    transform: translateY(0);
+    transition: color 0.3s ease;
 }
