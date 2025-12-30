@@ -65,16 +65,6 @@ export const verifyOtp = (email, otp) => async () => {
   }
 };
 
-export const registerUser = (user) => async (dispatch) => {
-  try {
-    await api.post("auth/registerUser", user, { headers: { "Content-Type": "application/json" } })
-    message.success('User created successful')
-    dispatch(getAllUsers());
-  } catch (error) {
-    message.error('Fail to create user')
-  }
-}
-
 export const resetPassword = (email, password) => async () => {
   try {
     await api.post("auth/resetpassword",  { email, password }, { headers: { "Content-Type": "application/json" } })

@@ -1,12 +1,7 @@
 import { Layout, Menu } from "antd";
 import {
-  DashboardOutlined,
-  AuditOutlined,
-  CheckCircleOutlined,
-  TeamOutlined,
   UserOutlined,
   FileTextOutlined,
-  SettingOutlined
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import '../../styles/Layouts.css';
@@ -30,22 +25,20 @@ const Sidebar = ({ role }) => {
         selectedKeys={[location.pathname]}
         defaultOpenKeys={['user-management', 'documents']}
       >
-
+        <SubMenu key="documents" icon={<FileTextOutlined />} title="Documents">
+          <Menu.Item key="/documents/designer" onClick={() => navigate('/documents/designer')}>
+            Designer Documents
+          </Menu.Item>
+          <Menu.Item key="/documents/completed" onClick={() => navigate('/documents/completed')}>
+            Completed Documents
+          </Menu.Item>
+        </SubMenu>
         <SubMenu key="user-management" icon={<UserOutlined />} title="User Management">
           <Menu.Item key="/users/add" onClick={() => navigate('/users/add')}>
             Add User
           </Menu.Item>
           <Menu.Item key="/users/view" onClick={() => navigate('/users/view')}>
-            View User
-          </Menu.Item>
-        </SubMenu>
-
-        <SubMenu key="documents" icon={<FileTextOutlined />} title="Documents">
-          <Menu.Item key="/documents/completed" onClick={() => navigate('/documents/completed')}>
-            Completed Documents
-          </Menu.Item>
-          <Menu.Item key="/documents/designer" onClick={() => navigate('/documents/designer')}>
-            Designer Documents
+            View Users
           </Menu.Item>
         </SubMenu>
       </Menu>

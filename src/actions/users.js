@@ -14,3 +14,14 @@ export const getAllUsers = () => async (dispatch) => {
     return [];
   }
 };
+
+
+export const registerUser = (user) => async (dispatch) => {
+  try {
+    await api.post("/users/registerUser", user, { headers: { "Content-Type": "application/json" } })
+    message.success('User created successful')
+    dispatch(getAllUsers());
+  } catch (error) {
+    message.error('Fail to create user')
+  }
+}

@@ -1,7 +1,7 @@
 import { bindActionCreators } from '@reduxjs/toolkit'
 import { connect } from 'react-redux'
-import { registerUser } from '../actions/login'
-import { Card, Form, Input, Button, Select, message } from 'antd'
+import { registerUser } from '../actions/users'
+import { Card, Form, Input, Button, Select } from 'antd'
 import '../styles/registerUser.css'
 
 const { Option } = Select
@@ -13,10 +13,8 @@ const RegisterUser = (props) => {
   const handleRegister = async (values) => {
     try {
       await actions.registerUser(values)
-      message.success('User registered successfully!')
       form.resetFields()
     } catch (error) {
-      message.error('Registration failed!')
       console.error(error)
     }
   }

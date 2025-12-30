@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Card, Button, Input, message, Spin, Tag, Modal, Space } from 'antd'
+import { Card, Button, Input, message, Spin, Tag, Modal, Space, Alert } from 'antd'
 import { Page, Document, pdfjs } from 'react-pdf'
 import SignatureCanvas from 'react-signature-canvas'
 import {getDocumentByToken, getDesigner, getViewUrl, submitCompletedDocument } from '../../actions/designer'
@@ -30,6 +30,8 @@ const DocumentCompletion = (props) => {
   const [currentSignatureFieldId, setCurrentSignatureFieldId] = useState(null)
   const sigPad = useRef({})
 
+  const [isReadOnly, setIsReadOnly] = useState(false)
+  
   useEffect(() => {
     fetchCompletionData()
   }, [token])
@@ -44,6 +46,11 @@ const DocumentCompletion = (props) => {
       
       const { url } = await actions.getViewUrl(completion.designerId)
       setPdfUrl(url)
+
+      if (completion.status === 'completed') {
+          setIsReadOnly(true)
+          message.info('This document has already been submitted.')
+      }
 
       const initialValues = {}
       const consolidated = completion.consolidatedData || {}
@@ -74,6 +81,8 @@ const DocumentCompletion = (props) => {
 
 
   const handleFieldChange = (id, value) => {
+    if (isReadOnly) return
+
     setFieldValues(prev => ({
       ...prev,
       [id]: value
@@ -88,6 +97,7 @@ const DocumentCompletion = (props) => {
 
   
   const openSignatureModal = (fieldId) => {
+    if (isReadOnly) return
     setCurrentSignatureFieldId(fieldId)
     setSignatureModalVisible(true)
   }
@@ -104,6 +114,7 @@ const DocumentCompletion = (props) => {
   }
 
   const handleSubmit = async () => {
+    if (isReadOnly) return
     if (!designer || !designer.fields) return
 
     const myFields = designer.fields.filter(f => isFieldEnabled(f))
@@ -142,7 +153,7 @@ const DocumentCompletion = (props) => {
   }
 
   const isFieldEnabled = (field) => {
-    return completionData && field.userId === completionData.currentUserId
+    return !isReadOnly && completionData && field.userId === completionData.currentUserId
   }
 
   const renderField = (field, pageNumber) => {
@@ -281,8 +292,17 @@ const DocumentCompletion = (props) => {
   return (
     <div className="completed-document-container">
       <Card title={designer?.title || 'Document Completion'} className="completed-document-card">
+        {isReadOnly && (
+            <Alert
+                message="Document Already Submitted"
+                description="This document has already been completed and cannot be edited. You are viewing a read-only version."
+                type="info"
+                showIcon
+                style={{ marginBottom: '20px' }}
+            />
+        )}
         <div className="completion-instruction">
-             Please fill in the fields assigned to you. Fields assigned to other users are disabled.
+             {isReadOnly ? 'Viewing read-only version of submitted document.' : 'Please fill in the fields assigned to you. Fields assigned to other users are disabled.'}
         </div>
 
         <div className="document-viewer-wrapper">
@@ -307,14 +327,16 @@ const DocumentCompletion = (props) => {
           <div className="completion-footer">
             <Space>
               <Button onClick={() => navigate('/')}>Cancel</Button>
-              <Button
-                type="primary"
-                size="large"
-                loading={submitting}
-                onClick={handleSubmit}
-              >
-                Submit Document
-              </Button>
+              {!isReadOnly && (
+                  <Button
+                    type="primary"
+                    size="large"
+                    loading={submitting}
+                    onClick={handleSubmit}
+                  >
+                    Submit Document
+                  </Button>
+              )}
             </Space>
           </div>
         }

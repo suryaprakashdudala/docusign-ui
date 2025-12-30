@@ -30,10 +30,10 @@ export const requestPresignedUrl = (designerId, fileName, contentType) => async 
 export const updateDesignerMetadata = (designerId, payload) => async (dispatch) => {
   try {
     const res = await api.put(`designers/${designerId}`, payload);
-    message.success("Designer metadata updated successfully");
+    message.success("Document uploaded successfully");
     return res.data;
   } catch (error) {
-    message.error("Failed to update designer metadata");
+    message.error("Failed to update document");
     throw error;
   }
 };

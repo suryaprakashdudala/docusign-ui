@@ -5,6 +5,7 @@ import ForgotPassword from '../components/ForgotPassword';
 import ResetPassword from '../components/ResetPassword';
 import RegisterUser from '../components/RegisterUser';
 import DocumentCompletion from '../components/DocumentCompletion/DocumentCompletion';
+import SubmissionSuccess from '../components/DocumentCompletion/SubmissionSuccess';
 import CompletedDocument from '../components/CompletedDocument/CompletedDocument';
 
 import GlobalLayout from "./GlobalLayout";
@@ -22,6 +23,7 @@ const AppRouter = () => {
       <Route path="/register-user" element={<RegisterUser />} />
 
       <Route path="/documents/complete/:token" element={<DocumentCompletion />} />
+      <Route path="/document-submitted" element={<SubmissionSuccess />} />
       <Route path="/documents/final/:designerId" element={<CompletedDocument />} />
 
       <Route element={<GlobalLayout />}>

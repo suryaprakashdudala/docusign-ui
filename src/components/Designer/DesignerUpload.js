@@ -137,15 +137,11 @@ const DesignerUpload = ({ actions, onComplete }) => {
         d.id,
         { s3Key: pres.key, pages: pageCount },
       )
-
-      message.success('Upload complete and metadata saved')
-      
       if (onComplete) {
         onComplete({ ...updatedDesigner, s3Key: pres.key, pages: pageCount })
       }
     } catch (err) {
       console.error('Upload flow error', err)
-      message.error(err.message || 'Upload failed')
     } finally {
       setUploading(false)
       setProgress(0)
@@ -199,12 +195,6 @@ const DesignerUpload = ({ actions, onComplete }) => {
             Reset
           </Button>
         </div>
-
-        {designer && (
-          <div className="designer-upload-id-info">
-            <Text strong>Designer ID:</Text> <Text code>{designer.id}</Text>
-          </div>
-        )}
       </Card>
     </div>
   )
