@@ -13,6 +13,7 @@ import DesignerStepper from "../components/Designer/DesignerStepper";
 import ViewUser from "../components/UserManagement/ViewUser";
 import CompletedDocumentsList from "../components/Documents/CompletedDocumentsList";
 import DesignerDocuments from "../components/Documents/DesignerDocuments";
+import SessionExpiry from "../components/SessionExpiry";
 
 const AppRouter = () => {
   return (
@@ -21,6 +22,7 @@ const AppRouter = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/register-user" element={<RegisterUser />} />
+      <Route path="/session-expired" element={<SessionExpiry />} />
 
       <Route path="/documents/complete/:token" element={<DocumentCompletion />} />
       <Route path="/document-submitted" element={<SubmissionSuccess />} />
