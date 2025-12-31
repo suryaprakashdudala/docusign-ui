@@ -67,9 +67,9 @@ const DesignerStepper = ({ actions }) => {
         <UserSelection
           actions={actions}
           designer={designer}
-          onComplete={(mappedUsers) => {
-            setDesigner(prev => ({ ...prev, recipients: mappedUsers }))
-            setSelectedUsers(mappedUsers)
+          onComplete={(updatedDesigner) => {
+            setDesigner(updatedDesigner)
+            setSelectedUsers(updatedDesigner.recipients)
             setCurrent(2)
           }}
           onBack={() => {

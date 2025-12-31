@@ -2,7 +2,7 @@ import React from 'react'
 import { Tag } from 'antd'
 import '../../styles/Designer.css'
 
-const FieldBadge = ({ icon, label, required, userColor, userInitial }) => (
+const FieldBadge = ({ icon, label, required, userColor, userInitial, isTemplate }) => (
   <>
     {icon}
     <span className="field-badge-label">{label}</span>
@@ -11,9 +11,11 @@ const FieldBadge = ({ icon, label, required, userColor, userInitial }) => (
         Required
       </Tag>
     )}
-    <Tag color={userColor} className="field-badge-user">
-      {userInitial}
-    </Tag>
+    {!isTemplate && (
+        <Tag color={userColor} className="field-badge-user">
+            {userInitial}
+        </Tag>
+    )}
   </>
 )
 

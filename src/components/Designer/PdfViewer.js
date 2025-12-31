@@ -40,7 +40,8 @@ const PdfViewer = ({
   draggedField,
   setDraggedField,
   getUserColor,
-  getUserName
+  getUserName,
+  isTemplate
 }) => {
   const [pageSizes, setPageSizes] = React.useState({})
   
@@ -114,7 +115,7 @@ const PdfViewer = ({
   const renderField = (field, pageNumber) => {
     if (field.page !== pageNumber) return null
 
-    const userColor = getUserColor(field.userId)
+    const userColor = isTemplate ? '#1890ff' : getUserColor(field.userId)
     const pageSize = pageSizes[pageNumber] || {
       width: 600,
       height: 600 * 1.414
@@ -194,6 +195,7 @@ const PdfViewer = ({
                 required={field.required}
                 userColor={userColor}
                 userInitial={getUserName(field.userId).charAt(0).toUpperCase()}
+                isTemplate={isTemplate}
             />
         </div>
       </Rnd>

@@ -58,7 +58,8 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
     setError(null)
 
     try {
-      const designerData = await actions.getDesigner(designer.id)
+      const designerData = (await actions.getDesigner(designer.id)) || {}
+      const isTempl = designerData.status === 'template'
 
       if (designerData.viewUrl) {
         setDocumentUrl(designerData.viewUrl)
@@ -69,7 +70,9 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
       if (designerData.fields) setFields(designerData.fields)
       if (designerData.pages) setNumPages(designerData.pages)
 
-      if (selectedUsers && selectedUsers.length > 0) {
+      if (isTempl) {
+        setSelectedUser('placeholder_signer')
+      } else if (selectedUsers && selectedUsers.length > 0) {
         setSelectedUser(selectedUsers[0].userId)
       }
     } catch (err) {
@@ -199,11 +202,14 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
     form.resetFields()
   }
 
-  const handleSubmit = async (isTemplate = false) => {
+  const handleSubmit = async () => {
     if (!designer?.id) {
       message.error('Designer not found')
       return
     }
+    
+    const isTemplateDoc = designer.status === 'template';
+
     if (fields.length === 0) {
       Modal.warning({
         title: 'No Fields Added',
@@ -212,33 +218,33 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
       });
       return
     }
-    if (!selectedUsers || selectedUsers.length === 0) {
-      message.warning('Please select at least one user')
-      return
-    }
 
-    const usersWithoutEmail = selectedUsers.filter(u => !u.email)
-    if (usersWithoutEmail.length > 0) {
-      message.error(
-        `Some users don't have email addresses: ${usersWithoutEmail
-          .map(u => u.firstName || u.userName)
-          .join(', ')}`
-      )
-      return
+    if (!isTemplateDoc) {
+        if (!selectedUsers || selectedUsers.length === 0) {
+          message.warning('Please select at least one user')
+          return
+        }
+
+        const usersWithoutEmail = selectedUsers.filter(u => !u.email)
+        if (usersWithoutEmail.length > 0) {
+          message.error(
+            `Some users don't have email addresses: ${usersWithoutEmail
+              .map(u => u.firstName || u.userName)
+              .join(', ')}`
+          )
+          return
+        }
     }
 
     setIsSubmitting(true)
     try {
-      
       const loDesigner = {
         ...designer,
         fields,
-        status: isTemplate ? 'template' : 'draft',
         pages: numPages
       }
       await actions.updateDesignerMetadata(designer.id, loDesigner)
-      // await actions.sendDesignerEmails(designer.id, selectedUsers)
-      message.success(isTemplate ? "Template saved successfully" : "Document saved successfully");
+      message.success(isTemplateDoc ? "Template saved successfully" : "Document saved successfully");
       navigate('/documents/designer')
     } catch (err) {
       console.error('Failed to submit designer:', err)
@@ -259,6 +265,7 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
           selectedUsers={selectedUsers}
           onBack={onBack}
           onControlDragStart={handleControlDragStart}
+          isTemplate={designer?.status === 'template'}
         />
       </Sider>
 
@@ -280,6 +287,7 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
           setDraggedField={setDraggedField}
           getUserColor={getUserColor}
           getUserName={getUserName}
+          isTemplate={designer?.status === 'template'}
         />
       </Content>
 
@@ -292,6 +300,7 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
           totalFields={fields.length}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
+          isTemplate={designer?.status === 'template'}
         />
       </Sider>
 

@@ -7,8 +7,7 @@ const SidebarRight = ({
   totalFields,
   isSubmitting,
   onSubmit,
-  onSaveTemplate,
-  onBack
+  isTemplate
 }) => (
   <div className="sidebar-right-container">
     <div className="document-info-title">Document Info</div>
@@ -27,20 +26,8 @@ const SidebarRight = ({
         icon={<SendOutlined />}
         className="save-config-button"
       >
-        Save Configuration
+        {isTemplate ? 'Save Template' : 'Save Configuration'}
       </Button>
-      <Button
-        block
-        style={{ marginTop: '10px' }}
-        loading={isSubmitting}
-        onClick={onSaveTemplate}
-        className="save-template-button"
-      >
-        Save as Template
-      </Button>
-      {/* <Button type="default" block onClick={onBack} icon={<ArrowLeftOutlined />}>
-        Back
-      </Button> */}
     </div>
   </div>
 )

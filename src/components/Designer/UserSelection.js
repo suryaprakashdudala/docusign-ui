@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Select, Button, Tag, Space, message } from 'antd'
+import { Card, Select, Button, Tag, Space, message, Checkbox } from 'antd'
 import {
   UserOutlined,
   MailOutlined,
   ArrowLeftOutlined,
-  ArrowRightOutlined
+  ArrowRightOutlined,
+  FileTextOutlined
 } from '@ant-design/icons'
 import { updateDesignerMetadata } from '../../actions/designer'
 import { bindActionCreators } from '@reduxjs/toolkit'
@@ -19,14 +20,23 @@ const isValidEmail = (value) =>
 
 const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
   const [selectedValues, setSelectedValues] = useState([])
+  const [isTemplate, setIsTemplate] = useState(false)
 
   useEffect(() => {
+    if (designer?.status === 'template') {
+      setIsTemplate(true)
+    }
 
     if (designer?.recipients?.length) {
       const existingValues = designer.recipients.map(
         r => r.userId || r.email
       )
-      setSelectedValues(existingValues)
+      // If it's a template, the only recipient might be the placeholder "Signer"
+      if (designer?.status === 'template' && designer.recipients[0]?.userId === 'placeholder_signer') {
+          setSelectedValues([])
+      } else {
+          setSelectedValues(existingValues)
+      }
     }
   }, [designer])
 
@@ -57,8 +67,21 @@ const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
     setSelectedValues(values)
   }
 
-  const buildRecipients = () =>
-    selectedValues.map((value, index) => {
+  const buildRecipients = () => {
+    if (isTemplate) {
+        return [{
+            id: 'placeholder_signer',
+            userId: 'placeholder_signer',
+            userName: 'Signer',
+            firstName: 'Generic',
+            lastName: 'Signer',
+            email: 'signer@template.local',
+            isExternal: false,
+            color: generateColor(0)
+        }]
+    }
+
+    return selectedValues.map((value, index) => {
       const user = users.find(u => u.id === value)
 
       if (user) {
@@ -85,25 +108,30 @@ const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
         color: generateColor(index)
       }
     })
+  }
 
   const handleNext = async () => {
-    if (!selectedValues.length) {
+    if (!isTemplate && !selectedValues.length) {
       message.warning('Please select at least one user or email')
       return
     }
 
     try {
       const recipients = buildRecipients()
+      const updatedStatus = isTemplate ? 'template' : (designer?.status === 'template' ? 'draft' : designer?.status);
 
-      await actions.updateDesignerMetadata(designer.id, {
+      const updatedDesigner = {
         ...designer,
+        status: updatedStatus,
         recipients
-      })
+      };
 
-      message.success("Users saved successfully");
-      onComplete?.(recipients)
+      await actions.updateDesignerMetadata(designer.id, updatedDesigner)
+
+      message.success(isTemplate ? "Template mode enabled" : "Users saved successfully");
+      onComplete?.(updatedDesigner)
     } catch {
-      message.error('Failed to save recipients')
+      message.error('Failed to save configuration')
     }
   }
 
@@ -121,64 +149,94 @@ const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
 
   return (
     <div>
-      <Card title="Select Users for Document" className="user-selection-card">
+      <Card title="Recipients Configuration" className="user-selection-card">
         <Space direction="vertical" className="user-selection-space" size="large">
-          <div>
-            <label className="user-selection-label">
-              Select Users or Add Emails:
-            </label>
-
-            <Select
-              mode="tags"
-              className="user-selection-select"
-              placeholder="Select users or type an email address"
-              value={selectedValues}
-              onChange={handleUserChange}
-              optionLabelProp="label"
-              tokenSeparators={[',', ' ']}
+          <div className="template-toggle-section" style={{ marginBottom: '10px', padding: '10px', background: '#f5f5f5', borderRadius: '4px' }}>
+            <Checkbox 
+                checked={isTemplate} 
+                onChange={e => setIsTemplate(e.target.checked)}
+                className="template-checkbox"
             >
-              {users.map(user => (
-                <Option
-                  key={user.id}
-                  value={user.id}
-                  label={`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.userName}
-                >
-                  <Space>
-                    <UserOutlined />
-                    <span>{user.firstName} {user.lastName}</span>
-                    <span className="user-selection-username">({user.userName})</span>
-                  </Space>
-                </Option>
-              ))}
-            </Select>
+              <span style={{ fontWeight: 600, fontSize: '16px' }}>
+                <FileTextOutlined style={{ marginRight: '8px' }} />
+                Create as a reusable Template
+              </span>
+            </Checkbox>
+            <p style={{ marginTop: '8px', marginLeft: '24px', color: '#666' }}>
+                Templates are generic configurations that can be sent to anyone later. No specific users needed now.
+            </p>
           </div>
 
-          {selectedValues.length > 0 && (
-            <div>
-              <label className="user-selection-label">
-                Selected Recipients ({selectedValues.length}):
-              </label>
+          {!isTemplate && (
+            <>
+              <div>
+                <label className="user-selection-label">
+                  Select Users or Add Emails:
+                </label>
 
-              <Space wrap>
-                {getSelectedDisplayUsers().map((user, index) => (
-                  <Tag
-                    key={user.id}
-                    color={generateColor(index)}
-                    className="user-selection-tag"
-                  >
-                    {user.isExternal ? (
-                      <>
-                        <MailOutlined /> {user.email}
-                      </>
-                    ) : (
-                      <>
-                        <UserOutlined /> {user.firstName} {user.lastName}
-                      </>
-                    )}
-                  </Tag>
-                ))}
-              </Space>
-            </div>
+                <Select
+                  mode="tags"
+                  className="user-selection-select"
+                  placeholder="Select users or type an email address"
+                  value={selectedValues}
+                  onChange={handleUserChange}
+                  optionLabelProp="label"
+                  tokenSeparators={[',', ' ']}
+                >
+                  {users.map(user => (
+                    <Option
+                      key={user.id}
+                      value={user.id}
+                      label={`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.userName}
+                    >
+                      <Space>
+                        <UserOutlined />
+                        <span>{user.firstName} {user.lastName}</span>
+                        <span className="user-selection-username">({user.userName})</span>
+                      </Space>
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+
+              {selectedValues.length > 0 && (
+                <div>
+                  <label className="user-selection-label">
+                    Selected Recipients ({selectedValues.length}):
+                  </label>
+
+                  <Space wrap>
+                    {getSelectedDisplayUsers().map((user, index) => (
+                      <Tag
+                        key={user.id}
+                        color={generateColor(index)}
+                        className="user-selection-tag"
+                      >
+                        {user.isExternal ? (
+                          <>
+                            <MailOutlined /> {user.email}
+                          </>
+                        ) : (
+                          <>
+                            <UserOutlined /> {user.firstName} {user.lastName}
+                          </>
+                        )}
+                      </Tag>
+                    ))}
+                  </Space>
+                </div>
+              )}
+            </>
+          )}
+
+          {isTemplate && (
+              <div style={{ textAlign: 'center', padding: '20px', border: '1px dashed #d9d9d9', borderRadius: '4px' }}>
+                  <Space direction="vertical">
+                      <FileTextOutlined style={{ fontSize: '32px', color: '#1890ff' }} />
+                      <div style={{ fontWeight: 500 }}>Generic Template Mode Active</div>
+                      <div style={{ color: '#888' }}>You can skip recipient selection and proceed to design the document structure.</div>
+                  </Space>
+              </div>
           )}
         </Space>
       </Card>
