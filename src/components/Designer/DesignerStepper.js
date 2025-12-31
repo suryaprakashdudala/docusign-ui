@@ -33,10 +33,12 @@ const DesignerStepper = ({ actions }) => {
           console.log("Fetched designer data:", data);
           if(data) {
               setDesigner(data)
-              if(data.recipients) {
+              if(data.recipients && data.recipients.length > 0) {
                   setSelectedUsers(data.recipients)
+                  setCurrent(2) 
+              } else {
+                  setCurrent(1)
               }
-              setCurrent(2) 
           }
       } catch (e) {
           console.error("Failed to load designer", e)

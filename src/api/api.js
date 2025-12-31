@@ -16,10 +16,14 @@ API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      if (window.location.pathname !== '/session-expired') {
-        window.location.href = '/session-expired';
+      const isLoginRequest = error.config.url.endsWith('/auth/login');
+      
+      if (!isLoginRequest) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        if (window.location.pathname !== '/session-expired') {
+          window.location.href = '/session-expired';
+        }
       }
     }
     return Promise.reject(error);

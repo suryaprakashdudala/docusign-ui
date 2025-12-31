@@ -30,7 +30,6 @@ export const requestPresignedUrl = (designerId, fileName, contentType) => async 
 export const updateDesignerMetadata = (designerId, payload) => async (dispatch) => {
   try {
     const res = await api.put(`designers/${designerId}`, payload);
-    message.success("Document uploaded successfully");
     return res.data;
   } catch (error) {
     message.error("Failed to update document");
@@ -153,5 +152,18 @@ export const getDesignerValues = (id) => async (dispatch) => {
     } catch (error) {
         console.error("Failed to get values", error);
         return {};
+    }
+};
+
+// 14) Bulk Publish Template
+export const bulkPublishDesigner = (id, users) => async (dispatch) => {
+    try {
+        const res = await api.post(`/designers/${id}/bulk-publish`, { users });
+        message.success(`Successfully sent to ${res.data.clonedCount} users`);
+        return true;
+    } catch (error) {
+        console.error("Failed to bulk publish", error);
+        message.error("Failed to distribute template to users");
+        return false;
     }
 };

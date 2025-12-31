@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Layout, message } from 'antd'
+import { Layout, message, Modal } from 'antd'
 import { bindActionCreators } from '@reduxjs/toolkit'
 import { connect } from 'react-redux'
 import {
@@ -199,13 +199,17 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
     form.resetFields()
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (isTemplate = false) => {
     if (!designer?.id) {
       message.error('Designer not found')
       return
     }
     if (fields.length === 0) {
-      message.warning('Please add at least one field before submitting')
+      Modal.warning({
+        title: 'No Fields Added',
+        content: 'Please add at least one field to the document before saving the configuration.',
+        okText: 'Got it',
+      });
       return
     }
     if (!selectedUsers || selectedUsers.length === 0) {
@@ -229,18 +233,15 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
       const loDesigner = {
         ...designer,
         fields,
-        status: 'draft',
+        status: isTemplate ? 'template' : 'draft',
         pages: numPages
       }
       await actions.updateDesignerMetadata(designer.id, loDesigner)
       // await actions.sendDesignerEmails(designer.id, selectedUsers)
-      message.success('Document submitted! Emails sent to selected users.')
+      message.success(isTemplate ? "Template saved successfully" : "Document saved successfully");
       navigate('/documents/designer')
     } catch (err) {
       console.error('Failed to submit designer:', err)
-      const errorMessage =
-        err?.response?.data?.error || err?.message || 'Unknown error'
-      message.error(`Failed to submit document: ${errorMessage}`)
     } finally {
       setIsSubmitting(false)
     }

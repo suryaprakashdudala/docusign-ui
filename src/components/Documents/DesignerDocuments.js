@@ -1,7 +1,8 @@
-import { Table, Card, Tag, Button, Space, Dropdown, Menu, Modal } from "antd";
+import { Table, Card, Tag, Button, Space, Dropdown, Menu, Modal, Select, message } from "antd";
 import { useState, useEffect } from "react";
-import { FileOutlined, PlusOutlined, EyeOutlined, EllipsisOutlined, DeleteOutlined, CloudUploadOutlined, ExclamationCircleOutlined, EditOutlined } from "@ant-design/icons";
-import { getAllDesigners, deleteDesigner, publishDesigner } from "../../actions/designer";
+import { FileOutlined, PlusOutlined, EyeOutlined, EllipsisOutlined, DeleteOutlined, CloudUploadOutlined, ExclamationCircleOutlined, EditOutlined, AuditOutlined, SendOutlined } from "@ant-design/icons";
+import { getAllDesigners, deleteDesigner, publishDesigner, bulkPublishDesigner } from "../../actions/designer";
+import { getAllUsers } from "../../actions/users";
 import { connect } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import DocumentPreview from "../DocumentCompletion/DocumentPreview";
@@ -10,9 +11,10 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import '../../styles/Designer.css'
 
 const { confirm } = Modal;
+const { Option } = Select;
 
 const DesignerDocuments = (props) => {
-    const { actions } = props
+    const { actions, users } = props
     const navigate = useNavigate();
     const [designers, setDesigners] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -21,8 +23,14 @@ const DesignerDocuments = (props) => {
     const [previewVisible, setPreviewVisible] = useState(false);
     const [selectedDesigner, setSelectedDesigner] = useState(null);
 
+    // Bulk Send State
+    const [bulkModalVisible, setBulkModalVisible] = useState(false);
+    const [selectedBulkUsers, setSelectedBulkUsers] = useState([]);
+    const [isBulkSending, setIsBulkSending] = useState(false);
+
     useEffect(() => {
         fetchDesigners();
+        actions.getAllUsers();
     }, []);
 
     const fetchDesigners = async () => {
@@ -69,17 +77,82 @@ const DesignerDocuments = (props) => {
         }
     };
 
+    const handleBulkSend = (record) => {
+        setSelectedDesigner(record);
+        setBulkModalVisible(true);
+        setSelectedBulkUsers([]);
+    };
+
+    const executeBulkSend = async () => {
+        if (selectedBulkUsers.length === 0) {
+            message.warning("Please select at least one user");
+            return;
+        }
+
+        setIsBulkSending(true);
+        try {
+            const targetUsers = users.filter(u => selectedBulkUsers.includes(u.id));
+            const success = await actions.bulkPublishDesigner(selectedDesigner.id, targetUsers);
+            if (success) {
+                setBulkModalVisible(false);
+                fetchDesigners();
+            }
+        } finally {
+            setIsBulkSending(false);
+        }
+    };
+
     const handleEdit = (record) => {
         navigate(`/designers/edit/${record.id}`);
     };
 
+    const handleAudit = (record) => {
+        Modal.info({
+            title: 'Document Audit Summary',
+            width: 600,
+            content: (
+                <div style={{ marginTop: '20px' }}>
+                    <p><strong>Published At:</strong> {record.updatedAt ? moment(record.updatedAt).format('MMMM Do YYYY, h:mm:ss a') : 'N/A'}</p>
+                    <p style={{ marginBottom: '8px' }}><strong>Assigned Recipients:</strong></p>
+                    <ul style={{ paddingLeft: '20px' }}>
+                        {record.recipients && record.recipients.length > 0 ? (
+                            record.recipients.map((user, idx) => (
+                                <li key={idx}>
+                                    {user.firstName} {user.lastName} ({user.email || user.userName})
+                                </li>
+                            ))
+                        ) : (
+                            <li>No recipients assigned</li>
+                        )}
+                    </ul>
+                    <p style={{ marginTop: '16px', fontStyle: 'italic' }}>
+                        This document has been published and sent to the recipients above.
+                    </p>
+                </div>
+            ),
+            okText: 'Close',
+        });
+    };
+
     const getMenu = (record) => {
         const isPublished = record.status === 'published';
+        const isTemplate = record.status === 'template';
+
         return (
             <Menu>
                 <Menu.Item key="preview" icon={<EyeOutlined />} onClick={() => handlePreview(record)}>
                     Preview
                 </Menu.Item>
+                {isPublished && (
+                    <Menu.Item key="audit" icon={<AuditOutlined />} onClick={() => handleAudit(record)}>
+                        Published Info
+                    </Menu.Item>
+                )}
+                {isTemplate && (
+                    <Menu.Item key="bulk-send" icon={<SendOutlined />} onClick={() => handleBulkSend(record)}>
+                        Bulk Send
+                    </Menu.Item>
+                )}
                 {!isPublished && (
                     <>
                         <Menu.Item key="edit" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
@@ -128,6 +201,7 @@ const DesignerDocuments = (props) => {
             render: (status) => {
                 let color = "default";
                 if (status === "published") color = "success";
+                if (status === "template") color = "blue";
                 if (status === "draft") color = "warning";
                 if (status === "sent") color = "processing";
                 return <Tag color={color}>{status ? status.toUpperCase() : 'N/A'}</Tag>;
@@ -177,9 +251,41 @@ const DesignerDocuments = (props) => {
                 onClose={() => setPreviewVisible(false)}
                 mode="design"
             />
+
+            <Modal
+                title="Bulk Distribution"
+                visible={bulkModalVisible}
+                onOk={executeBulkSend}
+                onCancel={() => setBulkModalVisible(false)}
+                confirmLoading={isBulkSending}
+                okText="Send To All"
+                width={500}
+            >
+                <div style={{ marginBottom: '16px' }}>
+                    <p>Select the users you want to send this template to. Each user will receive their own individual copy to sign.</p>
+                </div>
+                <Select
+                    mode="multiple"
+                    style={{ width: '100%' }}
+                    placeholder="Select recipients"
+                    value={selectedBulkUsers}
+                    onChange={setSelectedBulkUsers}
+                    optionFilterProp="children"
+                >
+                    {users.map(user => (
+                        <Option key={user.id} value={user.id}>
+                            {user.firstName} {user.lastName} ({user.userName})
+                        </Option>
+                    ))}
+                </Select>
+            </Modal>
         </>
     );
 };
+
+const mapStateToProps = (state) => ({
+    users: state.users.list || []
+});
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators(
@@ -187,8 +293,10 @@ const mapDispatchToProps = (dispatch) => ({
       getAllDesigners, 
       deleteDesigner, 
       publishDesigner,
+      bulkPublishDesigner,
+      getAllUsers
     },
     dispatch
   ),
 })
-export default connect(null, mapDispatchToProps)(DesignerDocuments);
+export default connect(mapStateToProps, mapDispatchToProps)(DesignerDocuments);

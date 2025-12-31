@@ -100,6 +100,7 @@ const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
         recipients
       })
 
+      message.success("Users saved successfully");
       onComplete?.(recipients)
     } catch {
       message.error('Failed to save recipients')
