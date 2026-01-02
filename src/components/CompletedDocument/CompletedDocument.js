@@ -19,6 +19,7 @@ const CompletedDocument = (props) => {
   const [fieldValues, setFieldValues] = useState({})
   const [pdfUrl, setPdfUrl] = useState(null)
   const [numPages, setNumPages] = useState(null)
+  const [pageSizes, setPageSizes] = useState({})
 
   useEffect(() => {
     fetchData()
@@ -50,11 +51,26 @@ const CompletedDocument = (props) => {
     setNumPages(numPages)
   }
 
+  const onPageLoadSuccess = (page, pageNum) => {
+    const viewport = page.getViewport({ scale: 1 })
+    const scale = 600 / viewport.width
+    const height = viewport.height * scale
+    
+    setPageSizes(prev => ({
+        ...prev,
+        [pageNum]: {
+            width: 600,
+            height: height
+        }
+    }))
+  }
+
   const renderField = (field, pageNumber) => {
     const value = fieldValues[field.id] || ''
     
     const pdfWidth = 600 
-    const pdfHeight = pdfWidth * 1.414 
+    const pageSize = pageSizes[pageNumber] || { width: 600, height: 600 * 1.414 }
+    const pdfHeight = pageSize.height
     const left = (field.x / 100) * pdfWidth
     const top = (field.y / 100) * pdfHeight
     
@@ -80,7 +96,7 @@ const CompletedDocument = (props) => {
         break
       case FIELD_TYPES.TEXTAREA:
         fieldComponent = (
-          <div className="completed-field-textarea">
+          <div className="completed-field-textarea" style={{ whiteSpace: 'pre-wrap', overflow: 'auto' }}>
              {value}
           </div>
         )
@@ -120,9 +136,6 @@ const CompletedDocument = (props) => {
 
     return (
       <div key={field.id} className="document-field" style={fieldStyle}>
-        <div className="document-field-label">
-          {field.label}
-        </div>
         {fieldComponent}
       </div>
     )
@@ -147,6 +160,7 @@ const CompletedDocument = (props) => {
                         width={600} 
                         renderTextLayer={false}
                         renderAnnotationLayer={false}
+                        onLoadSuccess={(page) => onPageLoadSuccess(page, index + 1)}
                     />
                      {/* Using null-safe check for designer.fields */}
                     {designer?.fields

@@ -59,7 +59,7 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
 
     try {
       const designerData = (await actions.getDesigner(designer.id)) || {}
-      const isTempl = designerData.status === 'template'
+      const isTempl = designerData.type === 'Template Document'
 
       if (designerData.viewUrl) {
         setDocumentUrl(designerData.viewUrl)
@@ -208,7 +208,7 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
       return
     }
     
-    const isTemplateDoc = designer.status === 'template';
+    const isTemplateDoc = designer.type === 'Template Document';
 
     if (fields.length === 0) {
       Modal.warning({
@@ -265,7 +265,7 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
           selectedUsers={selectedUsers}
           onBack={onBack}
           onControlDragStart={handleControlDragStart}
-          isTemplate={designer?.status === 'template'}
+          isTemplate={designer?.type === 'Template Document'}
         />
       </Sider>
 
@@ -287,7 +287,7 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
           setDraggedField={setDraggedField}
           getUserColor={getUserColor}
           getUserName={getUserName}
-          isTemplate={designer?.status === 'template'}
+          isTemplate={designer?.type === 'Template Document'}
         />
       </Content>
 
@@ -300,7 +300,7 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
           totalFields={fields.length}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
-          isTemplate={designer?.status === 'template'}
+          isTemplate={designer?.type === 'Template Document'}
         />
       </Sider>
 
@@ -317,6 +317,7 @@ const DesignerConfig = ({ actions, designer, selectedUsers, onBack, onFieldsUpda
         onDelete={handleDeleteField}
         getUserColor={getUserColor}
         getUserName={getUserName}
+        isTemplate={designer?.type === 'Template Document'}
       />
     </Layout>
   )

@@ -12,6 +12,7 @@ const DocumentPreview = ({ designer, visible, onClose, initialValues = {}, mode 
     const [loading, setLoading] = useState(false);
 
     const [pageDimensions, setPageDimensions] = useState({});
+    const [isPdfLoaded, setIsPdfLoaded] = useState(false);
 
     useEffect(() => {
         if (visible && designer) {
@@ -59,6 +60,9 @@ const DocumentPreview = ({ designer, visible, onClose, initialValues = {}, mode 
                 aspectRatio: viewport.width / viewport.height
             }
         }));
+        if (index === 1) {
+            setIsPdfLoaded(true);
+        }
     };
 
     const renderField = (field, index) => {
@@ -142,7 +146,7 @@ const DocumentPreview = ({ designer, visible, onClose, initialValues = {}, mode 
             onCancel={onClose}
             width={800}
             footer={[
-                <Button key="print" onClick={handlePrint}>Print</Button>,
+                <Button key="print" onClick={handlePrint} disabled={!isPdfLoaded}>Print</Button>,
                 <Button key="close" onClick={onClose}>Close</Button>
             ]}
             className="document-preview-modal custom-modal-style"

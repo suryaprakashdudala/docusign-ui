@@ -8,6 +8,7 @@ import UserSelection from './UserSelection'
 import DesignerConfig from './DesignerConfig'
 import { createDesigner, requestPresignedUrl, updateDesignerMetadata, getDesigner } from '../../actions/designer'
 import '../../styles/DesignerStepper.css'
+import _ from 'lodash'
 
 const { Step } = Steps
 
@@ -74,7 +75,7 @@ const DesignerStepper = ({ actions }) => {
           }}
           onBack={() => {
               if (id) {
-                  message.info("Cannot change document file while editing. Retrieve a new document to start over.")
+                  message.info("Cannot change document file while editing. Upload a new document to start over.")
               } else {
                   setCurrent(0)
               }

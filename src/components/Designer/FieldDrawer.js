@@ -13,7 +13,8 @@ const FieldDrawer = ({
   onSave,
   onDelete,
   getUserColor,
-  getUserName
+  getUserName,
+  isTemplate,
 }) => {
   const handleSave = async () => {
     try {
@@ -60,20 +61,12 @@ const FieldDrawer = ({
           <Switch checkedChildren="Required" unCheckedChildren="Optional" />
         </Form.Item>
 
-        {field && (
+        {(field && !isTemplate) && (
           <>
             <Form.Item label="Assigned To">
               <Tag color={getUserColor(field.userId)}>
                 {getUserName(field.userId)}
               </Tag>
-            </Form.Item>
-
-            <Form.Item label="Position">
-              <div>
-                Page: {field.page}, X:{' '}
-                {field.x != null ? field.x.toFixed(1) : 0}%, Y:{' '}
-                {field.y != null ? field.y.toFixed(1) : 0}%
-              </div>
             </Form.Item>
           </>
         )}

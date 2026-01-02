@@ -2,13 +2,13 @@ import { Table, Card, Tag, Button, Space, Dropdown, Menu, Modal, Select, message
 import { useState, useEffect } from "react";
 import { FileOutlined, PlusOutlined, EyeOutlined, EllipsisOutlined, DeleteOutlined, CloudUploadOutlined, ExclamationCircleOutlined, EditOutlined, AuditOutlined, SendOutlined } from "@ant-design/icons";
 import { getAllDesigners, deleteDesigner, publishDesigner, bulkPublishDesigner } from "../../actions/designer";
-import { getAllUsers } from "../../actions/users";
 import { connect } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import DocumentPreview from "../DocumentCompletion/DocumentPreview";
 import moment from 'moment';
 import { bindActionCreators } from "@reduxjs/toolkit";
 import '../../styles/Designer.css'
+import { isValidEmail } from "../../utils/validation";
 
 const { confirm } = Modal;
 const { Option } = Select;
@@ -30,7 +30,6 @@ const DesignerDocuments = (props) => {
 
     useEffect(() => {
         fetchDesigners();
-        actions.getAllUsers();
     }, []);
 
     const fetchDesigners = async () => {
@@ -85,13 +84,46 @@ const DesignerDocuments = (props) => {
 
     const executeBulkSend = async () => {
         if (selectedBulkUsers.length === 0) {
-            message.warning("Please select at least one user");
+            message.warning("Please select at least one user or email");
             return;
         }
 
         setIsBulkSending(true);
         try {
-            const targetUsers = users.filter(u => selectedBulkUsers.includes(u.id));
+            const targetUsers = selectedBulkUsers.map(value => {
+                const existingUser = users.find(u => u.id === value);
+                if (existingUser) {
+                    return {
+                        id: existingUser.id,
+                        userId: existingUser.id,
+                        userName: existingUser.userName,
+                        firstName: existingUser.firstName,
+                        lastName: existingUser.lastName,
+                        email: existingUser.email,
+                        isExternal: false
+                    };
+                }
+                
+                if (isValidEmail(value)) {
+                    return {
+                        id: value,
+                        userId: value,
+                        userName: value,
+                        firstName: '',
+                        lastName: '',
+                        email: value,
+                        isExternal: true
+                    };
+                }
+                
+                return null;
+            }).filter(u => u !== null);
+
+            if (targetUsers.length === 0) {
+                message.error("No valid users or emails selected");
+                return;
+            }
+
             const success = await actions.bulkPublishDesigner(selectedDesigner.id, targetUsers);
             if (success) {
                 setBulkModalVisible(false);
@@ -136,7 +168,7 @@ const DesignerDocuments = (props) => {
 
     const getMenu = (record) => {
         const isPublished = record.status === 'published';
-        const isTemplate = record.status === 'template';
+        const isTemplate = record.type === 'Template Document';
 
         return (
             <Menu>
@@ -195,15 +227,26 @@ const DesignerDocuments = (props) => {
             render: (date) => date ? moment(date).format('YYYY-MM-DD HH:mm') : 'N/A',
         },
         {
+            title: "Type",
+            dataIndex: "type",
+            key: "type",
+            render: (type) => (
+                <Tag color={type === "Template Document" ? "purple" : "cyan"}>
+                    {type || 'Document'}
+                </Tag>
+            ),
+        },
+        {
             title: "Status",
             dataIndex: "status",
             key: "status",
-            render: (status) => {
+            render: (status, record) => {
                 let color = "default";
                 if (status === "published") color = "success";
-                if (status === "template") color = "blue";
                 if (status === "draft") color = "warning";
                 if (status === "sent") color = "processing";
+                
+                // For templates, we want to emphasize they are templates but still show draft status
                 return <Tag color={color}>{status ? status.toUpperCase() : 'N/A'}</Tag>;
             },
         },
@@ -253,24 +296,27 @@ const DesignerDocuments = (props) => {
             />
 
             <Modal
-                title="Bulk Distribution"
-                visible={bulkModalVisible}
+                title="Bulk Send"
+                open={bulkModalVisible}
                 onOk={executeBulkSend}
                 onCancel={() => setBulkModalVisible(false)}
                 confirmLoading={isBulkSending}
                 okText="Send To All"
-                width={500}
+                width={500}  
+                styles={{body:{minHeight: 250, overflowY: 'auto', },}}
+
             >
                 <div style={{ marginBottom: '16px' }}>
                     <p>Select the users you want to send this template to. Each user will receive their own individual copy to sign.</p>
                 </div>
                 <Select
-                    mode="multiple"
+                    mode="tags"
                     style={{ width: '100%' }}
-                    placeholder="Select recipients"
+                    placeholder="Select recipients or type email address"
                     value={selectedBulkUsers}
                     onChange={setSelectedBulkUsers}
                     optionFilterProp="children"
+                    tokenSeparators={[',', ' ']}
                 >
                     {users.map(user => (
                         <Option key={user.id} value={user.id}>
@@ -294,7 +340,6 @@ const mapDispatchToProps = (dispatch) => ({
       deleteDesigner, 
       publishDesigner,
       bulkPublishDesigner,
-      getAllUsers
     },
     dispatch
   ),

@@ -158,8 +158,8 @@ export const getDesignerValues = (id) => async (dispatch) => {
 // 14) Bulk Publish Template
 export const bulkPublishDesigner = (id, users) => async (dispatch) => {
     try {
-        const res = await api.post(`/designers/${id}/bulk-publish`, { users });
-        message.success(`Successfully sent to ${res.data.clonedCount} users`);
+        await api.post(`/designers/${id}/bulk-publish`, { users });
+        message.success('Successfully sent to the selected users');
         return true;
     } catch (error) {
         console.error("Failed to bulk publish", error);

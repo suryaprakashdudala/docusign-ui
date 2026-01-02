@@ -58,11 +58,9 @@
     align-items: center;
     justify-content: center;
     color: black;
+    background-color: #fff;
 }
 
-.preview-field-signature.placeholder {
-    color: #ccc;
-}
 
 .signature-img {
     max-width: 100%;

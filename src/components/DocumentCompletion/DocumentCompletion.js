@@ -28,7 +28,16 @@ const DocumentCompletion = (props) => {
   
   const [signatureModalVisible, setSignatureModalVisible] = useState(false)
   const [currentSignatureFieldId, setCurrentSignatureFieldId] = useState(null)
-  const sigPad = useRef({})
+  const sigPad = useRef(null)
+
+  const [pageSizes, setPageSizes] = useState({})
+  const [isDocumentLoaded, setIsDocumentLoaded] = useState(false)
+
+  useEffect(() => {
+    if (signatureModalVisible && sigPad.current && typeof sigPad.current.clear === 'function') {
+      sigPad.current.clear()
+    }
+  }, [signatureModalVisible])
 
   const [isReadOnly, setIsReadOnly] = useState(false)
   
@@ -75,6 +84,24 @@ const DocumentCompletion = (props) => {
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages)
+  }
+
+  const onPageLoadSuccess = (page, pageNum) => {
+    const viewport = page.getViewport({ scale: 1 })
+    const scale = 600 / viewport.width
+    const height = viewport.height * scale
+    
+    setPageSizes(prev => ({
+        ...prev,
+        [pageNum]: {
+            width: 600,
+            height: height
+        }
+    }))
+
+    if (pageNum === 1) {
+        setIsDocumentLoaded(true)
+    }
   }
 
   const [errors, setErrors] = useState({})
@@ -162,7 +189,8 @@ const DocumentCompletion = (props) => {
     const error = errors[field.id]
     
     const pdfWidth = 600
-    const pdfHeight = pdfWidth * 1.414
+    const pageSize = pageSizes[pageNumber] || { width: 600, height: 600 * 1.414 }
+    const pdfHeight = pageSize.height
     const left = (field.x / 100) * pdfWidth
     const top = (field.y / 100) * pdfHeight
     
@@ -200,6 +228,7 @@ const DocumentCompletion = (props) => {
             placeholder={field.label}
             status={error ? 'error' : ''}
             className="full-size-input resize-none"
+            autoSize={{ minRows: 2, maxRows: 6 }}
           />
         )
         break
@@ -270,10 +299,6 @@ const DocumentCompletion = (props) => {
 
     return (
       <div key={field.id} className="document-field" style={fieldStyle}>
-        <div className="document-field-label">
-          {field.label}
-          {field.required && <Tag color="red" className="required-tag">Req</Tag>}
-        </div>
         
         {fieldComponent}
         
@@ -314,6 +339,7 @@ const DocumentCompletion = (props) => {
                         width={600} 
                         renderTextLayer={false}
                         renderAnnotationLayer={false}
+                        onLoadSuccess={(page) => onPageLoadSuccess(page, index + 1)}
                     />
                     {designer?.fields
                         ?.filter(f => (f.page || 1) === index + 1)
@@ -333,6 +359,7 @@ const DocumentCompletion = (props) => {
                     size="large"
                     loading={submitting}
                     onClick={handleSubmit}
+                    disabled={!isDocumentLoaded}
                   >
                     Submit Document
                   </Button>

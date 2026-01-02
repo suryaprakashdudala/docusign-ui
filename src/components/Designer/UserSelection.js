@@ -12,18 +12,17 @@ import { bindActionCreators } from '@reduxjs/toolkit'
 import { connect } from 'react-redux'
 import '../../styles/UserSelection.css'
 import { generateColor } from '../../utils/colorUtils'
+import { isValidEmail } from '../../utils/validation'
 
 const { Option } = Select
 
-const isValidEmail = (value) =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 
 const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
   const [selectedValues, setSelectedValues] = useState([])
   const [isTemplate, setIsTemplate] = useState(false)
 
   useEffect(() => {
-    if (designer?.status === 'template') {
+    if (designer?.type === 'Template Document') {
       setIsTemplate(true)
     }
 
@@ -32,7 +31,7 @@ const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
         r => r.userId || r.email
       )
       // If it's a template, the only recipient might be the placeholder "Signer"
-      if (designer?.status === 'template' && designer.recipients[0]?.userId === 'placeholder_signer') {
+      if (designer?.type === 'Template Document' && designer.recipients[0]?.userId === 'placeholder_signer') {
           setSelectedValues([])
       } else {
           setSelectedValues(existingValues)
@@ -69,16 +68,7 @@ const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
 
   const buildRecipients = () => {
     if (isTemplate) {
-        return [{
-            id: 'placeholder_signer',
-            userId: 'placeholder_signer',
-            userName: 'Signer',
-            firstName: 'Generic',
-            lastName: 'Signer',
-            email: 'signer@template.local',
-            isExternal: false,
-            color: generateColor(0)
-        }]
+        return []
     }
 
     return selectedValues.map((value, index) => {
@@ -118,11 +108,13 @@ const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
 
     try {
       const recipients = buildRecipients()
-      const updatedStatus = isTemplate ? 'template' : (designer?.status === 'template' ? 'draft' : designer?.status);
+      const updatedType = isTemplate ? 'Template Document' : 'Document';
+      const updatedStatus = isTemplate ? 'draft' : (designer?.status);
 
       const updatedDesigner = {
         ...designer,
         status: updatedStatus,
+        type: updatedType,
         recipients
       };
 
@@ -156,6 +148,7 @@ const UserSelection = ({ actions, designer, onComplete, onBack, users }) => {
                 checked={isTemplate} 
                 onChange={e => setIsTemplate(e.target.checked)}
                 className="template-checkbox"
+                disabled={isTemplate}
             >
               <span style={{ fontWeight: 600, fontSize: '16px' }}>
                 <FileTextOutlined style={{ marginRight: '8px' }} />
