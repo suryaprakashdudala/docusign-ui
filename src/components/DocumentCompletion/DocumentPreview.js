@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Spin, message} from 'antd';
 import { Document, Page, pdfjs } from 'react-pdf';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import '../../styles/DocumentPreview.css';
 import { FIELD_TYPES } from '../../constants/constants';
 
@@ -13,6 +15,7 @@ const DocumentPreview = ({ designer, visible, onClose, initialValues = {}, mode 
 
     const [pageDimensions, setPageDimensions] = useState({});
     const [isPdfLoaded, setIsPdfLoaded] = useState(false);
+    const [generatingPdf, setGeneratingPdf] = useState(false);
 
     useEffect(() => {
         if (visible && designer) {
@@ -41,8 +44,50 @@ const DocumentPreview = ({ designer, visible, onClose, initialValues = {}, mode 
         }
     };
 
-    const handlePrint = () => {
-        window.print();
+    const handleDownload = async () => {
+        const pages = document.querySelectorAll('.preview-page-container');
+        if (!pages || pages.length === 0) return;
+
+        setGeneratingPdf(true);
+        message.loading({ content: 'Generating PDF...', key: 'pdf-gen' });
+        try {
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            for (let i = 0; i < pages.length; i++) {
+                const pageElement = pages[i];
+                const canvas = await html2canvas(pageElement, {
+                    scale: 2, 
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                
+                // Add page if not the first one
+                if (i > 0) {
+                    pdf.addPage();
+                }
+
+                const imgWidth = canvas.width;
+                const imgHeight = canvas.height;
+                const ratio = imgWidth / pdfWidth;
+                const imgPdfHeight = imgHeight / ratio;
+
+                // Position at top (0,0) and scale to full width
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, imgPdfHeight, undefined, 'FAST');
+            }
+
+            pdf.save(`${designer?.title || 'document'}.pdf`);
+            message.success({ content: 'Downloaded successfully', key: 'pdf-gen' });
+        } catch (err) {
+            console.error('PDF generation error:', err);
+            message.error({ content: 'Failed to generate PDF', key: 'pdf-gen' });
+        } finally {
+            setGeneratingPdf(false);
+        }
     };
 
     const onDocumentLoadSuccess = ({ numPages }) => {
@@ -146,7 +191,15 @@ const DocumentPreview = ({ designer, visible, onClose, initialValues = {}, mode 
             onCancel={onClose}
             width={800}
             footer={[
-                <Button key="print" onClick={handlePrint} disabled={!isPdfLoaded}>Print</Button>,
+                <Button 
+                    key="download" 
+                    type="primary"
+                    onClick={handleDownload} 
+                    disabled={!isPdfLoaded}
+                    loading={generatingPdf}
+                >
+                    Download PDF
+                </Button>,
                 <Button key="close" onClick={onClose}>Close</Button>
             ]}
             className="document-preview-modal custom-modal-style"

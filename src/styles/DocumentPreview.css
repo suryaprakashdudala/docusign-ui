@@ -82,3 +82,57 @@
     transform: scale(1.5);
     margin: 0;
 }
+
+@media print {
+
+    /* Hide everything by default */
+    body * {
+        visibility: hidden;
+    }
+
+    /* Only show the print area */
+    .print-area,
+    .print-area * {
+        visibility: visible;
+    }
+
+    /* Position the print area at the top left of the physical page */
+    .print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: white !important;
+    }
+
+    /* Hide any UI wrappers/modals/buttons that might still be visible */
+    .ant-modal-mask,
+    .ant-modal-wrap,
+    .ant-modal-header,
+    .ant-modal-footer,
+    .ant-modal-close,
+    .ant-btn {
+        display: none !important;
+    }
+
+    /* Remove shadows and backgrounds for clean print */
+    .preview-page-container {
+        box-shadow: none !important;
+        margin-bottom: 0 !important;
+        page-break-after: always;
+    }
+
+    .preview-wrapper {
+        background: white !important;
+        padding: 0 !important;
+    }
+
+    /* Reset modal body constraints */
+    .document-preview-modal .ant-modal-body {
+        max-height: none !important;
+        overflow: visible !important;
+        padding: 0 !important;
+    }
+}
