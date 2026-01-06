@@ -43,21 +43,22 @@ export const logout = () => (dispatch) => {
     dispatch({ type: USER_LOGOUT });
 };
 
-export const forgotPassword = (email) => async () => {
+export const forgotPassword = (userName) => async () => {
   try {
     await api.post(
-      "auth/forgotpassword", { email }, { headers: { "Content-Type": "application/json" } }
+      "auth/forgotpassword", { userName }, { headers: { "Content-Type": "application/json" } }
     );
-    message.success('Forgot password email sent!');
+    message.success('Forgot password request sent!');
   } catch (error) {
-    message.error('Forgot password failed: ' + (error.response?.data || 'Unknown error'));
+    console.log(error);
+    message.error('Forgot password failed');
   }
 };
 
-export const verifyOtp = (email, otp) => async () => {
+export const verifyOtp = (userName, otp) => async () => {
   try {
     await api.post(
-      "auth/verifyotp", { email, otp }, { headers: { "Content-Type": "application/json" } }
+      "auth/verifyotp", { userName, otp }, { headers: { "Content-Type": "application/json" } }
     );
     message.success('OTP verified successfully!');
   } catch (error) {
@@ -65,9 +66,9 @@ export const verifyOtp = (email, otp) => async () => {
   }
 };
 
-export const resetPassword = (email, password) => async () => {
+export const resetPassword = (userName, password) => async () => {
   try {
-    await api.post("auth/resetpassword",  { email, password }, { headers: { "Content-Type": "application/json" } })
+    await api.post("auth/resetpassword",  { userName, password }, { headers: { "Content-Type": "application/json" } })
     message.success('Password reset successful')
   } catch (error) {
     message.error('Fail to reset password')

@@ -10,18 +10,18 @@ import '../styles/Auth.css'
 
 const ForgotPassword = (props) => {
     const [verifyOtpMode, setVerifyOtpMode] = useState(false);
-    const [email, setEmail] = useState('');
+    const [userName, setUserName] = useState('');
     const { actions } = props
     const [form] = Form.useForm()
     const navigate = useNavigate()
     const handleForgotPassword = (values) => {
-        actions.forgotPassword(values.email)
-        setEmail(values.email);
+        actions.forgotPassword(values.userName)
+        setUserName(values.userName);
         setVerifyOtpMode(true);
     }
     const verifyOtp = async (otp) => {
-        await actions.verifyOtp(email, otp);
-        navigate('/reset-password', { state: { email: email, mode: 'forgot' } });
+        await actions.verifyOtp(userName, otp);
+        navigate('/reset-password', { state: { userName: userName, mode: 'forgot' } });
     }
     return (
         <div className="login-page">
@@ -33,17 +33,17 @@ const ForgotPassword = (props) => {
                     autoComplete="off"
                 >
                     <Form.Item
-                        label="Email"
-                        name="email"
+                        label="Username"
+                        name="userName"
                         rules={[
                             {
                                 required: true,
-                                message: 'Please input your email!',
+                                message: 'Please input your username!',
                             },
                         ]}
                     >
                         <Input
-                            placeholder="Enter your email"
+                            placeholder="Enter your username"
                             className="auth-input"
                         />
                     </Form.Item>

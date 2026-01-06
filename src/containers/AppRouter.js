@@ -34,6 +34,7 @@ const AppRouter = () => {
 
         <Route path="/users/add" element={<RegisterUser />} />
         <Route path="/users/view" element={<ViewUser />} />
+        <Route path="/users/edit/:id" element={<RegisterUser />} />
 
         <Route path="/documents/completed" element={<CompletedDocumentsList />} />
         <Route path="/documents/designer" element={<DesignerDocuments />} />

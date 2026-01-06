@@ -22,6 +22,20 @@ export const registerUser = (user) => async (dispatch) => {
     message.success('User created successful')
     dispatch(getAllUsers());
   } catch (error) {
-    message.error('Fail to create user')
+    const errorMsg = error.response?.data?.message || 'Fail to create user';
+    message.error(errorMsg);
+    throw error;
   }
 }
+
+export const updateUser = (id, user) => async (dispatch) => {
+    try {
+      await api.put(`/users/${id}`, user, { headers: { "Content-Type": "application/json" } })
+      message.success('User updated successful')
+      dispatch(getAllUsers());
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || 'Fail to update user';
+      message.error(errorMsg);
+      throw error;
+    }
+  }

@@ -1,16 +1,14 @@
-import { Table, Card, Tag, Modal, Button } from "antd";
-import { useState } from "react";
+import { Table, Card, Tag, Button } from "antd";
 import { connect } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import '../../styles/UserManagement.css'
 
 const ViewUser = (props) => {
   const { users } = props
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const navigate = useNavigate();
 
   const handleUserClick = (record) => {
-    setSelectedUser(record);
-    setIsModalOpen(true);
+    navigate(`/users/edit/${record.id}`);
   };
 
   const columns = [
@@ -58,53 +56,17 @@ const ViewUser = (props) => {
         </>
       ),
     },
-    // {
-    //   title: "Action",
-    //   key: "action",
-    //   render: (_, record) => (
-    //     <Button
-    //       type="link"
-    //       icon={<EyeOutlined />}
-    //       onClick={() => handleUserClick(record)}
-    //     >
-    //       View
-    //     </Button>
-    //   ),
-    // },
   ];
 
   return (
     <>
-      <Card title="User List" bordered={false}>
+      <Card title="User List" variant={"borderless"}>
         <Table
             columns={columns}
             dataSource={users}
-            // loading={loading}
             pagination={{ pageSize: 10 }}
         />
       </Card>
-
-      <Modal
-        title="User Details"
-        open={isModalOpen}
-        onOk={() => setIsModalOpen(false)}
-        onCancel={() => setIsModalOpen(false)}
-        footer={[
-           <Button key="close" onClick={() => setIsModalOpen(false)}>
-            Close
-          </Button>
-        ]}
-      >
-        {selectedUser && (
-          <div>
-            <p><strong>Username:</strong> {selectedUser.userName}</p>
-            <p><strong>First Name:</strong> {selectedUser.firstName}</p>
-            <p><strong>Last Name:</strong> {selectedUser.lastName}</p>
-            <p><strong>Email:</strong> {selectedUser.email}</p>
-            <p><strong>Roles:</strong> {Array.isArray(selectedUser.roles) ? selectedUser.roles.join(", ") : selectedUser.roles}</p>
-          </div>
-        )}
-      </Modal>
     </>
   );
 };

@@ -10,17 +10,11 @@ const ResetPassword = (props) => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
-  const email = location.state?.email;
   const userName = location.state?.userName;
   const mode = location.state?.mode || 'forgot';
   const isUpdateMode = mode === 'update';
 
-  if (!email && mode === 'forgot') {
-    message.error('Invalid request! Email not provided.');
-    navigate('/login');
-    return null;
-  }
-  if (!userName && mode === 'update') {
+  if (!userName) {
     message.error('Invalid request! Username not provided.');
     navigate('/login');
     return null;
@@ -30,7 +24,7 @@ const ResetPassword = (props) => {
     try {
 
       if(mode === 'forgot'){
-        await actions.resetPassword(email,values.password)
+        await actions.resetPassword(userName,values.password)
         navigate('/login');
       }
       else {
@@ -63,8 +57,8 @@ const ResetPassword = (props) => {
           onFinish={handleReset}
           autoComplete="off"
         >
-          <Form.Item label={isUpdateMode ? 'Username' : 'Email'}>
-            <Input value={isUpdateMode? userName : email} disabled />
+          <Form.Item label="Username">
+            <Input value={userName} disabled />
           </Form.Item>
 
           <Form.Item
