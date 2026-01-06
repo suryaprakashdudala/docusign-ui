@@ -24,7 +24,7 @@ const RegisterUser = (props) => {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
-          roles: user.roles,
+          role: user.role,
         })
       }
     } else if (!isEditMode) {
@@ -101,7 +101,7 @@ const RegisterUser = (props) => {
 
           <Form.Item
             label="Role"
-            name="roles"
+            name="role"
             rules={[
               { required: true, message: 'Please select a role!' },
             ]}

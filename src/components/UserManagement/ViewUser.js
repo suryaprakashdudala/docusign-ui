@@ -38,23 +38,19 @@ const ViewUser = (props) => {
       key: "email",
     },
     {
-      title: "Roles",
-      dataIndex: "roles",
-      key: "roles",
-      render: (roles) => (
-        <>
-          {Array.isArray(roles) ? roles.map((role) => {
-            let color = "geekblue";
-            if (role === "Admin") color = "volcano";
-            if (role === "Manager") color = "green";
-            return (
-              <Tag color={color} key={role} className="user-status-tag">
-                {role.toUpperCase()}
-              </Tag>
-            );
-          }) : <Tag>{roles}</Tag>}
-        </>
-      ),
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
+      render: (role) => {
+        let color = "geekblue";
+        if (role === "Admin") color = "volcano";
+        if (role === "Manager") color = "green";
+        return (
+          <Tag color={color} key={role} className="user-status-tag">
+            {role ? role.toUpperCase() : "N/A"}
+          </Tag>
+        );
+      },
     },
   ];
 
