@@ -16,7 +16,7 @@ const Sidebar = ({ role }) => {
   return (
     <Sider width={250} className="app-sidebar">
       <div className="sidebar-logo-container">
-        Demo Docusign
+        Document Signing Application
       </div>
 
       <Menu
